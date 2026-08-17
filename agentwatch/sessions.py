@@ -7,7 +7,7 @@ whole problem.
 The obvious join is to mangle the process's cwd into a directory name. It is wrong, and this is
 measured rather than assumed: of the 61 project directories on the development machine that
 record a cwd, 2 disagree with the rule `"/" -> "-"`, because newer versions also map `"." -> "-"`
-(`/home/jesse/.claude-mem/...` becomes `-home-jesse--claude-mem-...`, with the doubled dash) while
+(`~/.claude-mem/...` becomes `-<home>--claude-mem-...`, with the doubled dash) while
 older directories on the same disk keep their dots. Both conventions exist side by side, because a
 directory is created by whichever version was running at the time and never migrated.
 

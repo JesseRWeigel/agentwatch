@@ -31,11 +31,23 @@ REFRESH_SECONDS = 2.0
 HELP = "up/down move   l log   c cd here   K kill   r refresh   q quit"
 
 
+def fits(y: int, x: int, height: int, width: int) -> bool:
+    """Whether a write at (y, x) is inside a window of this size.
+
+    A free function rather than an inline condition so that it can be tested without a terminal.
+    It was inline, and the sabotage suite could not catch its removal: `addnstr` off the edge
+    raises `curses.error`, the except below swallows it, and the observable behaviour is
+    identical. Pulling the decision out makes the rule itself checkable, which is the difference
+    between a guard that is known to work and one that merely exists.
+    """
+    return 0 <= y < height and 0 <= x < width
+
+
 def _safe_addstr(window, y: int, x: int, text: str, attr: int = 0) -> None:
     """Draw, clipped to the window. Curses raises rather than clipping, including on the last cell
     of the last line, which is a classic way for a TUI to die on an unusual terminal size."""
     height, width = window.getmaxyx()
-    if y < 0 or y >= height or x >= width:
+    if not fits(y, x, height, width):
         return
     try:
         window.addnstr(y, x, text, max(0, width - x - 1), attr)

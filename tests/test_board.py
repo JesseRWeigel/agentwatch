@@ -48,8 +48,16 @@ class Rendering(unittest.TestCase):
         self.text = board.render_text(self.rows)
 
     def test_an_uncertain_match_is_drawn_differently_and_explained(self):
-        """A board that draws a guess like a fact is how somebody kills the wrong session."""
-        self.assertIn("?", self.text)
+        """A board that draws a guess like a fact is how somebody kills the wrong session.
+
+        Asserted on the ROW, not on the whole page. Searching the page for a "?" passed even with
+        the row marker removed, because the footer contains one, so the test agreed that a guess
+        was marked while the line a reader actually looks at said nothing. The sabotage suite
+        found that; this now checks the row and the footer separately.
+        """
+        row = [l for l in self.text.splitlines() if l.strip().startswith("301")][0]
+        self.assertTrue(row.rstrip().endswith("?"),
+                        f"the uncertain row carries no marker: {row!r}")
         self.assertIn("the log shown is a guess, not a match", self.text)
         self.assertIn("pid 301", self.text)
 
@@ -83,8 +91,8 @@ class Formatting(unittest.TestCase):
         self.assertEqual(board.tokens(None), "-")
 
     def test_a_short_label_falls_back_to_the_whole_path_at_the_root(self):
-        self.assertEqual(board.short_label("/home/a/b/repo"), "repo")
-        self.assertEqual(board.short_label("/home/a/b/repo/"), "repo")
+        self.assertEqual(board.short_label("/srv/a/b/repo"), "repo")
+        self.assertEqual(board.short_label("/srv/a/b/repo/"), "repo")
         self.assertEqual(board.short_label(None), "(not readable)")
 
 

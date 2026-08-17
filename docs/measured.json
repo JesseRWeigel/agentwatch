@@ -1,0 +1,242 @@
+{
+  "board": [
+    {
+      "age_seconds": 9990.0,
+      "certain": true,
+      "context_tokens": 2110,
+      "label": "quiet-repo",
+      "output_tokens": 100,
+      "pid": 101,
+      "state": "idle",
+      "tool": "Edit"
+    },
+    {
+      "age_seconds": 9980.0,
+      "certain": true,
+      "context_tokens": 1110,
+      "label": "shared-repo",
+      "output_tokens": 50,
+      "pid": 201,
+      "state": "idle",
+      "tool": "Bash"
+    },
+    {
+      "age_seconds": 9979.0,
+      "certain": true,
+      "context_tokens": 1110,
+      "label": "shared-repo",
+      "output_tokens": 50,
+      "pid": 202,
+      "state": "blocked?",
+      "tool": "Write"
+    },
+    {
+      "age_seconds": 9970.0,
+      "certain": false,
+      "context_tokens": 1110,
+      "label": "crowded-repo",
+      "output_tokens": 50,
+      "pid": 301,
+      "state": "idle",
+      "tool": "Grep"
+    },
+    {
+      "age_seconds": 9960.0,
+      "certain": false,
+      "context_tokens": 1110,
+      "label": "dotted",
+      "output_tokens": 50,
+      "pid": 401,
+      "state": "idle",
+      "tool": "Read"
+    },
+    {
+      "age_seconds": 9950.0,
+      "certain": false,
+      "context_tokens": null,
+      "label": "(not readable)",
+      "output_tokens": 0,
+      "pid": 501,
+      "state": "opaque",
+      "tool": null
+    }
+  ],
+  "branch": {
+    "in_a_repo": "measured-branch-name",
+    "outside_a_repo": null
+  },
+  "mangling": {
+    "with_dots": [
+      "-home-testsubject--config-dotted",
+      "-home-testsubject-.config-dotted"
+    ],
+    "without_dots": [
+      "-a-b-c"
+    ]
+  },
+  "parsing": {
+    "evidence_for_stale": "the log's last word is a request to use Bash with no result written for it",
+    "fresh_call_is_not_blocked": false,
+    "stale_call_is_blocked": false,
+    "two_calls_one_answered": {
+      "awaiting": true,
+      "current": "Bash"
+    }
+  },
+  "rendered_board": "    PID  WHERE                  BRANCH         STATE     TOOL                CTX    OUT   IDLE    AGE  LOG\n----------------------------------------------------------------------------------------------------------\n    101  quiet-repo             -              idle      Edit                 2k    100   2h44   2h46  11111111\n    201  shared-repo            -              idle      Bash                 1k     50   2h44   2h46  aaaaaaaa\n    202  shared-repo            -              blocked?  Write                1k     50   2h44   2h46  bbbbbbbb\n    301  crowded-repo           -              idle      Grep                 1k     50   2h44   2h46  cccccccc?\n    401  dotted                 -              idle      Read                 1k     50   2h44   2h46  eeeeeeee?\n    501  (not readable)         -              opaque    -                     -      0      -   2h45  -?\n\n? the log shown is a guess, not a match:\n    pid 301: 4 logs record this working directory and nothing here distinguishes them\n    pid 401: 2 logs record this working directory and nothing here distinguishes them\n    pid 501: the working directory is not readable, so no log can be found\n\npossibly waiting on a permission prompt (inferred, not recorded):\n    pid 202: the log's last word is a request to use Write with no result written for it\n",
+  "rendered_empty_board": "no agent sessions found.\nnothing named claude or codex is running under this user.\n",
+  "sessions": [
+    {
+      "awaiting_tool_result": false,
+      "candidate_count": 1,
+      "certain": true,
+      "chosen_session": "11111111-0000-0000-0000-000000000001",
+      "comm": "claude",
+      "confidence": "unique",
+      "context_tokens": 2110,
+      "current_tool": null,
+      "cwd_basename": "quiet-repo",
+      "evidence": "the last tool call, Edit, has its result",
+      "last_tool": "Edit",
+      "model": "test-model-1",
+      "opaque": false,
+      "output_tokens": 100,
+      "pid": 101,
+      "reason": "exactly one log records this working directory",
+      "session_id_from_argv": null,
+      "turns_in_tail": 2,
+      "version": "9.9.9"
+    },
+    {
+      "awaiting_tool_result": false,
+      "candidate_count": 1,
+      "certain": true,
+      "chosen_session": "aaaaaaaa-1111-2222-3333-444444444444",
+      "comm": "claude",
+      "confidence": "exact",
+      "context_tokens": 1110,
+      "current_tool": null,
+      "cwd_basename": "shared-repo",
+      "evidence": "the last tool call, Bash, has its result",
+      "last_tool": "Bash",
+      "model": "test-model-1",
+      "opaque": false,
+      "output_tokens": 50,
+      "pid": 201,
+      "reason": "the session id was on the command line",
+      "session_id_from_argv": "aaaaaaaa-1111-2222-3333-444444444444",
+      "turns_in_tail": 1,
+      "version": "9.9.9"
+    },
+    {
+      "awaiting_tool_result": true,
+      "candidate_count": 1,
+      "certain": true,
+      "chosen_session": "bbbbbbbb-1111-2222-3333-444444444444",
+      "comm": "claude",
+      "confidence": "unique",
+      "context_tokens": 1110,
+      "current_tool": "Write",
+      "cwd_basename": "shared-repo",
+      "evidence": "the log's last word is a request to use Write with no result written for it",
+      "last_tool": "Write",
+      "model": "test-model-1",
+      "opaque": false,
+      "output_tokens": 50,
+      "pid": 202,
+      "reason": "the only candidate left once other sessions claimed theirs",
+      "session_id_from_argv": null,
+      "turns_in_tail": 1,
+      "version": "9.9.9"
+    },
+    {
+      "awaiting_tool_result": false,
+      "candidate_count": 4,
+      "certain": false,
+      "chosen_session": "cccccccc-0000-0000-0000-000000000003",
+      "comm": "claude",
+      "confidence": "ambiguous",
+      "context_tokens": 1110,
+      "current_tool": null,
+      "cwd_basename": "crowded-repo",
+      "evidence": "the last tool call, Grep, has its result",
+      "last_tool": "Grep",
+      "model": "test-model-1",
+      "opaque": false,
+      "output_tokens": 50,
+      "pid": 301,
+      "reason": "4 logs record this working directory and nothing here distinguishes them",
+      "session_id_from_argv": null,
+      "turns_in_tail": 1,
+      "version": "9.9.9"
+    },
+    {
+      "awaiting_tool_result": false,
+      "candidate_count": 2,
+      "certain": false,
+      "chosen_session": "eeeeeeee-0000-0000-0000-000000000001",
+      "comm": "codex",
+      "confidence": "ambiguous",
+      "context_tokens": 1110,
+      "current_tool": null,
+      "cwd_basename": "dotted",
+      "evidence": "the last tool call, Read, has its result",
+      "last_tool": "Read",
+      "model": "test-model-1",
+      "opaque": false,
+      "output_tokens": 50,
+      "pid": 401,
+      "reason": "2 logs record this working directory and nothing here distinguishes them",
+      "session_id_from_argv": null,
+      "turns_in_tail": 1,
+      "version": null
+    },
+    {
+      "awaiting_tool_result": false,
+      "candidate_count": 0,
+      "certain": false,
+      "chosen_session": null,
+      "comm": "claude",
+      "confidence": "none",
+      "context_tokens": null,
+      "current_tool": null,
+      "cwd_basename": null,
+      "evidence": "",
+      "last_tool": null,
+      "model": null,
+      "opaque": true,
+      "output_tokens": 0,
+      "pid": 501,
+      "reason": "the working directory is not readable, so no log can be found",
+      "session_id_from_argv": null,
+      "turns_in_tail": 0,
+      "version": null
+    }
+  ],
+  "stat_cases": {
+    "no_parens": null,
+    "not_a_number": null,
+    "ordinary": [
+      "claude",
+      1,
+      12345
+    ],
+    "spaces_and_parens": [
+      "we (ird) name",
+      7,
+      999
+    ],
+    "too_short": null
+  },
+  "tail_read": {
+    "all_whole": true,
+    "lines": 1,
+    "parseable": 1
+  },
+  "totals": {
+    "ambiguous": 2,
+    "certain": 3,
+    "opaque": 1,
+    "sessions": 6
+  }
+}

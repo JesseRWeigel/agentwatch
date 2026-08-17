@@ -40,7 +40,7 @@ AGENT_COMMS = {"claude", "codex"}
 SESSION_ID = re.compile(
     r"\b([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\b", re.I)
 
-# The installed-version directory, e.g. /home/.../share/claude/versions/2.1.229. This is the
+# The installed-version directory, e.g. `~/.local/share/claude/versions/2.1.229`. This is the
 # version of the BINARY, which is not always the version that wrote the session log: a session
 # started before an upgrade keeps running the old code and records the old version in its log.
 VERSION_FROM_EXE = re.compile(r"/versions/([0-9][^/]*)$")
@@ -119,8 +119,10 @@ def parse_stat(text: str) -> tuple[str, int, int] | None:
         return None
     comm = text[open_paren + 1:close_paren]
     rest = text[close_paren + 1:].split()
-    if len(rest) < 20:
-        return None
+    # No length check here on purpose. One was written, and the sabotage suite showed it could
+    # not be observed: on a short line `int(rest[19])` raises IndexError, which the except below
+    # already turns into the same None. A guard whose removal changes nothing is not a guard, it
+    # is a second spelling of the line under it, and two spellings of one rule drift apart.
     try:
         # rest[0] is state, so field 4 (ppid) is rest[1] and field 22 (starttime) is rest[19].
         return comm, int(rest[1]), int(rest[19])
