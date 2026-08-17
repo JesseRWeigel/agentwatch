@@ -1,0 +1,3 @@
+{"type": "last-prompt", "sessionId": "aaaaaaaa-1111-2222-3333-444444444444", "cwd": "/home/testsubject/work/shared-repo", "gitBranch": "feature", "version": "9.9.9"}
+{"type": "assistant", "timestamp": "2023-11-14T22:15:01.000Z", "message": {"role": "assistant", "model": "test-model-1", "usage": {"input_tokens": 10, "cache_read_input_tokens": 1000, "cache_creation_input_tokens": 100, "output_tokens": 50}, "content": [{"type": "tool_use", "id": "toolu_0000", "name": "Bash"}]}}
+{"type": "user", "timestamp": "2023-11-14T22:15:02.000Z", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_0000", "content": "ok"}]}}
