@@ -117,6 +117,19 @@ Worth naming:
 
 ## Status
 
+The log reader skips non-object JSON records and ignores invalid message content and tool IDs.
+One unexpected entry no longer prevents the board from showing the surrounding valid records.
+
+Equal-timestamp candidates also keep the same display order without claiming a match.
+
+Current unit suite:
+
+```text
+Ran 67 tests
+```
+
+Historical verification below:
+
 `bash scripts/verify.sh`, exit code 0. Pasted whole, from the run that produced it:
 
 ```text

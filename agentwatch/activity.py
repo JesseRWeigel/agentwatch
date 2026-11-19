@@ -108,6 +108,9 @@ def parse(lines: list[str]) -> Activity:
         except (ValueError, TypeError):
             continue
 
+        if not isinstance(obj, dict):
+            continue
+
         stamp = _timestamp(obj)
         if stamp is not None:
             last_event = stamp if last_event is None else max(last_event, stamp)
@@ -117,6 +120,8 @@ def parse(lines: list[str]) -> Activity:
         if not isinstance(message, dict):
             continue
 
+        content = message.get("content")
+        items = content if isinstance(content, list) else []
         if kind == "assistant":
             turns += 1
             if isinstance(message.get("model"), str):
@@ -135,17 +140,20 @@ def parse(lines: list[str]) -> Activity:
                 produced = usage.get("output_tokens")
                 if isinstance(produced, int):
                     output_tokens += produced
-            for item in message.get("content") or []:
+            for item in items:
                 if isinstance(item, dict) and item.get("type") == "tool_use":
-                    name = item.get("name") or "?"
+                    name = item.get("name")
+                    name = name if isinstance(name, str) and name else "?"
                     last_tool = name
                     if isinstance(item.get("id"), str):
                         outstanding[item["id"]] = name
 
         elif kind == "user":
-            for item in message.get("content") or []:
+            for item in items:
                 if isinstance(item, dict) and item.get("type") == "tool_result":
-                    outstanding.pop(item.get("tool_use_id"), None)
+                    use_id = item.get("tool_use_id")
+                    if isinstance(use_id, str):
+                        outstanding.pop(use_id, None)
 
     current = next(iter(outstanding.values()), None) if outstanding else None
     if current is not None:

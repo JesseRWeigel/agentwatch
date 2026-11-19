@@ -6,14 +6,50 @@ Every case here exists because it was observed on a real machine, not because it
 from __future__ import annotations
 
 import os
+import tempfile
 import sys
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agentwatch import procs, sessions                          # noqa: E402
 from agentwatch.sessions import Confidence                      # noqa: E402
 from tests.common import claude_home, proc_root                 # noqa: E402
+
+
+class Metadata(unittest.TestCase):
+    def test_valid_non_object_record_does_not_hide_later_metadata(self):
+        with tempfile.TemporaryDirectory() as dirname:
+            path = os.path.join(dirname, "sample.jsonl")
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write('[{"cwd":"/wrong","gitBranch":"wrong"}]\n')
+                handle.write('{"cwd":"/expected","gitBranch":"main"}\n')
+            log = sessions.load_log(path)
+        self.assertIsNotNone(log)
+        self.assertEqual(log.recorded_cwd, "/expected")
+
+
+class CandidateOrder(unittest.TestCase):
+    def test_equal_mtimes_keep_the_fallback_order_stable(self):
+        cwd = "/expected"
+        with tempfile.TemporaryDirectory() as home:
+            project = os.path.join(home, "projects", "-expected")
+            os.makedirs(project)
+            names = ["first.jsonl", "last.jsonl"]
+            for name in names:
+                path = os.path.join(project, name)
+                with open(path, "w", encoding="utf-8") as handle:
+                    handle.write('{"cwd":"/expected"}\n')
+                os.utime(path, (1700000000, 1700000000))
+
+            with patch.object(sessions.os, "listdir", return_value=names):
+                first = sessions.candidate_logs(cwd, home)
+            with patch.object(sessions.os, "listdir", return_value=names[::-1]):
+                second = sessions.candidate_logs(cwd, home)
+
+        self.assertEqual([log.session_id for log in first], ["last", "first"])
+        self.assertEqual(first, second)
 
 
 class Mangling(unittest.TestCase):
