@@ -67,6 +67,31 @@ class Parsing(unittest.TestCase):
         state = activity.parse(["{not json", "", assistant("Read"), '{"partial":'])
         self.assertEqual(state.last_tool, "Read")
 
+    def test_non_object_json_records_are_ignored(self):
+        state = activity.parse(["null", "42", "[]", assistant("Read"), result()])
+        self.assertEqual(state.last_tool, "Read")
+        self.assertFalse(state.awaiting_tool_result)
+
+    def test_non_array_message_content_is_ignored(self):
+        malformed = json.dumps({"type": "assistant", "message": {"content": 42}})
+        state = activity.parse([assistant("Edit"), malformed, result()])
+        self.assertEqual(state.last_tool, "Edit")
+        self.assertFalse(state.awaiting_tool_result)
+
+    def test_non_string_tool_ids_cannot_break_or_clear_outstanding_calls(self):
+        bad_result = json.dumps({"type": "user", "message": {"content": [
+            {"type": "tool_result", "tool_use_id": []}]}})
+        state = activity.parse([assistant("Read"), bad_result])
+        self.assertTrue(state.awaiting_tool_result)
+        self.assertEqual(state.current_tool, "Read")
+        self.assertFalse(activity.parse([assistant("Read"), bad_result, result()])
+                         .awaiting_tool_result)
+
+    def test_non_string_tool_names_are_not_displayed_as_values(self):
+        malformed = '{"type":"assistant","message":{"content":[{"type":"tool_use","id":"t1","name":42}]}}'
+        state = activity.parse([malformed])
+        self.assertEqual(state.current_tool, "?")
+
     def test_an_empty_tail_yields_an_empty_state_rather_than_an_error(self):
         state = activity.parse([])
         self.assertIsNone(state.last_event)

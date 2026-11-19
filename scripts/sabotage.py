@@ -84,8 +84,8 @@ SABOTAGES = [
     # ---- reading the log tail
     ("a tool result clears every outstanding call instead of its own",
      "agentwatch/activity.py",
-     r"                    outstanding\.pop\(item\.get\(\"tool_use_id\"\), None\)",
-     "                    outstanding.clear()", False),
+     r"                        outstanding\.pop\(use_id, None\)",
+     "                        outstanding.clear()", False),
     ("the partial line a seek lands inside is kept", "agentwatch/activity.py",
      r"                handle\.readline\(\)      # drop the partial line the seek landed inside",
      "                pass", False),

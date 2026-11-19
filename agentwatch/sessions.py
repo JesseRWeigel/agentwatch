@@ -99,6 +99,8 @@ def _metadata(path: str) -> tuple[str | None, str | None]:
                     obj = json.loads(line)
                 except (ValueError, TypeError):
                     continue
+                if not isinstance(obj, dict):
+                    continue
                 if cwd is None and isinstance(obj.get("cwd"), str):
                     cwd = obj["cwd"]
                 if branch is None and isinstance(obj.get("gitBranch"), str):
@@ -151,7 +153,10 @@ def candidate_logs(cwd: str, home: str = CLAUDE_HOME) -> list[SessionLog]:
             if log.recorded_cwd is not None and log.recorded_cwd != cwd:
                 continue
             found[log.path] = log
-    return sorted(found.values(), key=lambda log: log.modified, reverse=True)
+    # Equal mtimes are common on coarse filesystems and freshly checked-out fixtures. Stable
+    # tie-breaks keep a display-only guess from flipping with directory enumeration order.
+    return sorted(found.values(), key=lambda log: (log.modified, log.session_id, log.path),
+                  reverse=True)
 
 
 def correlate(process, home: str = CLAUDE_HOME, started_at: float | None = None) -> Correlation:

@@ -1,0 +1,34 @@
+name: Verify Agentwatch
+
+'on':
+  pull_request:
+    paths:
+      - agentwatch/**
+      - scripts/**
+      - tests/**
+      - fixtures/**
+      - docs/**
+      - README.md
+      - .github/workflows/verify.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Run the full verifier with an empty home
+        shell: bash
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          export HOME
+          HOME="$(mktemp -d "$RUNNER_TEMP/agentwatch-home.XXXXXXXX")"
+          python3 --version
+          bash scripts/verify.sh
